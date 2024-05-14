@@ -83,21 +83,21 @@ async def auto_count_handler(event):
 
     if message_text == '.' and str(event.sender_id) in admin_ids:
        
-        sent_message = await event.reply('▫️')
+        sent_message = await event.reply('✨')
         await asyncio.sleep(1)  
 
         
-        await sent_message.edit('▫️▫️')
+        await sent_message.edit('✨✨')
         await asyncio.sleep(2)  
 
-        await sent_message.edit('▫️▫️▫️')
+        await sent_message.edit('✨✨✨')
         await asyncio.sleep(2) 
 
        
-        await sent_message.edit('▫️▫️▫️▫️')
+        await sent_message.edit('✨✨✨✨')
       
         await asyncio.sleep(1)  
-        await sent_message.edit('... /sold ')
+        await sent_message.edit('✨✨✨✨✨ /sold ')
 
 from telethon.tl.types import ChannelParticipantsAdmins
 
@@ -130,7 +130,7 @@ async def sold_handler(event):
     replied_message_content = replied_message.text
 
     
-    sold_message = f"Item sold to {user_identifier} in {replied_message_content}: {custom_message}"
+    sold_message = f"sold to :- {user_identifier} \n \n sold in :- {replied_message_content} k: {custom_message}"
 
    
     sold_reply = await replied_message.reply(sold_message)
@@ -163,7 +163,7 @@ async def unsold_handler(event):
         await event.reply("Please provide the player's name in the /unsold command.")
 
 
-@client.on(events.NewMessage(pattern="^/tagall|@all|/all ?(.*)"))
+@client.on(events.NewMessage(pattern="^/tagall|@all|/mention|/all ?(.*)"))
 async def mentionall(event):
     chat_id = event.chat_id
     if event.is_private:
