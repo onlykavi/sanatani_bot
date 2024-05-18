@@ -22,7 +22,7 @@ from telethon.tl.types import ChannelParticipantsAdmins
 
 api_id = '28184846'
 api_hash = 'b79094c50e87edb77def9e04dcff3aa5'
-admin_ids = ['6265981509', '1661129466', '6468596992','5925882832','5232742343']
+admin_ids = ['6265981509', '1661129466', '6468596992','5925882832','5232742343','6301771663','1483217059']
 allowed_group_id = -1001940203596
 BOT_TOKEN = '6899547930:AAEw0hcXWkXw3FNAVPzhGr6769dtm9mcC5Y'
 client = TelegramClient('bot_username', api_id, api_hash)
