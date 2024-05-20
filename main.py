@@ -1,6 +1,6 @@
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, PhotoSize
-from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler, MessageHandler, filters, ConversationHandler
+from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler, MessageHandler, Filters, ConversationHandler
 import datetime
 import threading
 import re
@@ -935,13 +935,14 @@ def clear(update, context):
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('add', add)],
     states={
-        ITEM_NAME: [MessageHandler(filters.Text & ~filters.Command, item_name)],
-        NATURE_PAGE: [MessageHandler((filters.Text | filters.photo), item_name)],  # No negation here
-        ITEM_DETAILS: [MessageHandler(filters.Text & ~filters.Command, item_details)],
-        POKEMON_IV: [MessageHandler((filters.Text | filters.photo), pokemon_iv)],  # No negation here
-        MOVESET_PAGE: [MessageHandler((filters.Text | filters.photo), moveset_page)],  # No negation here
-        BOOSTED: [MessageHandler(filters.Text & ~filters.Command, boosted)],
-        BASE_PRICE: [MessageHandler(filters.Text & ~filters.Command, base_price)],
+        ITEM_NAME: [MessageHandler(Filters.text & ~Filters.command, item_name)],
+        NATURE_PAGE: [MessageHandler((Filters.text | Filters.photo) & ~Filters.command, nature_page)],
+        ITEM_DETAILS: [MessageHandler(Filters.text & ~Filters.command, item_details)],
+        POKEMON_IV: [MessageHandler((Filters.text | Filters.photo) & ~Filters.command, pokemon_iv)],
+        MOVESET_PAGE: [MessageHandler((Filters.text | Filters.photo) & ~Filters.command, moveset_page)],
+        BOOSTED: [MessageHandler(Filters.text & ~Filters.command, boosted)],
+        BASE_PRICE: [MessageHandler(Filters.text & ~Filters.command, base_price)],
+
     },
     fallbacks=[CommandHandler('cancel', cancel)],
 )
@@ -966,7 +967,7 @@ dispatcher.add_handler(CommandHandler('list', item_list))
 dispatcher.add_handler(CommandHandler('slots', slots))
 dispatcher.add_handler(CommandHandler('clear', clear))
 dispatcher.add_handler(CallbackQueryHandler(submission, pattern=submission_pattern))
-dispatcher.add_handler(MessageHandler(filters.text & ~filters.command & filters.regex(r'^\.$'), auto_count))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command & Filters.regex(r'^\.$'), auto_count))
 
 # Start the bot
 updater.start_polling()
