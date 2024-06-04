@@ -92,21 +92,20 @@ def handle_cancel(message):
 
 
 def is_admin(user_id):
-    admin_ids = [6882194604, 6076549174, 6545380269, 1257427765, 1483217059, 5925882832, 6301771663, 6265981509] 
+    admin_ids = [1661129466, 6468596992, 6241067084, 1655924853] 
     return user_id in admin_ids
 
-admin_id = [6882194604, 6076549174, 6301771663, 5925882832] 
+admin_id = [1661129466, 6468596992, 6241067084, 1655924853] 
 
 dxgays = []  # List of user IDs that are in dxgays
 xmods = []  # List of user IDs that are xmods
 user_cache = {}
 
-# Constants, replace with actual values
 AUCTION_GROUP_LINK = 'https://t.me/phg_hexa_group'
-log_channel = -100123456789  # Replace with your log channel ID
-post_channel = -100123456789  # Replace with your post channel ID
-approve_channel = -100123456789  # Replace with your approve channel ID
-reject_channel = -100123456789  # Replace with your reject channel ID
+log_channel = -1001872076127  # Replace with your log channel ID
+post_channel = -1001872076127  # Replace with your post channel ID
+approve_channel = -1002078082096  # Replace with your approve channel ID
+reject_channel = -1002078082096  # Replace with your reject channel ID
 
 @bot.message_handler(commands=['add'])
 def sell(message):
@@ -297,7 +296,7 @@ def handle_msg(message):
         except Exception as e:
             bot.reply_to(message, f"Failed to send message to user {user_id}: {e}")
 
-admin_ids_broad = ["6882194604", "6076549174", "6301771663", "5925882832"]
+admin_ids_broad = [1661129466, 6468596992, 6241067084, 1655924853] 
 
 @bot.message_handler(commands=['broad'])
 def broadcast(message):
@@ -316,7 +315,7 @@ def broadcast(message):
         else:
             bot.reply_to(message, "You're not authorized to perform this action.")
 
-group_id = -1002021868341
+group_id = -1001872076127
 
 @bot.message_handler(commands=['forward'])
 def send_message_prompt(message):
@@ -486,10 +485,10 @@ def handle_cmds(message):
 • /clear :- For bot owner (OWNER)''')
 
 admin_ids = {
-    6882194604: 'ᴰᴮᴬ ᴢᴇɴɪᴛꜱᴜ',
-    6076549174: 'ARYAN NISHAD ᴵᴴᴳ',
-    6301771663: 'ʀ𝙴ᴢ𝚆∆ɴ',
-    5925882832: 'ᴵᴴᴳ╰‿╯. ꜱʜᴇɪᴋʜ ꜱʜΔʜɪᴅ'
+ 1661129466
+ 6468596992
+ 6241067084
+ 1655924853
 }
 
 @bot.message_handler(commands=['admin'])
