@@ -211,7 +211,7 @@ def process_base(message, item_type, nature, evs, moveset, boosted):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submit'))
     markup.add(types.InlineKeyboardButton('Delete', callback_data='delete'))
-    bot.send_message(user_id, text, reply_markup=markup)
+     bot.send_photo(user_id, nature_pic, caption=text, reply_markup=markup)
 
 def process_tm(message, item_type):
     name = message.text
@@ -226,7 +226,7 @@ def process_tm_base(message, name):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submi'))
     markup.add(types.InlineKeyboardButton('Delete', callback_data='delet'))
-    bot.send_message(user_id, text, reply_markup=markup)
+     bot.send_photo(user_id, nature_pic, caption=text, reply_markup=markup)
 
 def submit_item(call):
     user_id = call.from_user.id
