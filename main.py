@@ -10,7 +10,7 @@ import re
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telebot.types import InputMediaPhoto
 
-API_TOKEN = '7078628340:AAFxo2fP959VA44yDOXOoAG5d5wNzfA9tE4'
+API_TOKEN = '6796970894:AAFbyciSZJOf_DB4NIQrBe-euLcNehg0NZo'
 
 bot = telebot.TeleBot(API_TOKEN)
 
