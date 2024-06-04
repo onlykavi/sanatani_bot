@@ -97,8 +97,8 @@ def is_admin(user_id):
 
 admin_id = [1661129466, 6468596992, 6241067084, 1655924853] 
 
-dxgays = []  # List of user IDs that are in dxgays
-xmods = []  # List of user IDs that are xmods
+dxgays = [1661129466, 1655924853, 6241067084]  # List of user IDs that are in dxgays
+xmods = [1661129466, 6468596992, 6241067084, 1655924853]   # List of user IDs that are xmods
 user_cache = {}
 
 AUCTION_GROUP_LINK = 'https://t.me/phg_hexa_group'
