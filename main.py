@@ -97,6 +97,184 @@ def is_admin(user_id):
 
 admin_id = [6882194604, 6076549174, 6301771663, 5925882832] 
 
+dxgays = []  # List of user IDs that are in dxgays
+xmods = []  # List of user IDs that are xmods
+user_cache = {}
+
+# Constants, replace with actual values
+AUCTION_GROUP_LINK = 'https://t.me/phg_hexa_group'
+log_channel = -100123456789  # Replace with your log channel ID
+post_channel = -100123456789  # Replace with your post channel ID
+approve_channel = -100123456789  # Replace with your approve channel ID
+reject_channel = -100123456789  # Replace with your reject channel ID
+
+@bot.message_handler(commands=['add'])
+def sell(message):
+    user_id = message.from_user.id
+    first_name = message.from_user.first_name
+    username = message.from_user.username
+
+    if user_id in dxgays:
+        bot.send_message(user_id, f"Ho Ho Ho\n\nIf you want to sell something in auction how about you sell your mom to xmods. "
+                                 f"Although your moms are already free WHORE whose price is free for a year to use by anyone and they have such loose pussy.\n\n"
+                                 f"{first_name} mom has got best whore award, {first_name} is trying to find about his real dad, when {first_name} fills any form in father section he writes xmods and 3.97 billion others.")
+    else:
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton('Yes', callback_data='yes'))
+        markup.add(types.InlineKeyboardButton('No', callback_data='No'))
+        if username:
+            bot.send_message(user_id, f"Hello @{username}!\n\nWould you like to sell something in auction?", reply_markup=markup)
+        else:
+            bot.send_message(user_id, "Hello!\n\nWould you like to sell something in auction?", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data in ['yes', 'No', 'legendary', 'ol', 'shiny', 'tms', 'submit', 'delete', 'submi', 'delet', 'approve', 'reject', 'rejtrash', 'rejinco', 'highbase', 'scammer'])
+def callback_handler(call):
+    user_id = call.from_user.id
+    if call.data == 'yes':
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton('LEGENDARY', callback_data='legendary'))
+        markup.add(types.InlineKeyboardButton('0L/NON LEGENDARY', callback_data='ol'))
+        markup.add(types.InlineKeyboardButton('SHINY', callback_data='shiny'))
+        markup.add(types.InlineKeyboardButton('TMS', callback_data='tms'))
+        bot.edit_message_text('So what would you like to sell?', call.message.chat.id, call.message.message_id, reply_markup=markup)
+    elif call.data == 'No':
+        bot.edit_message_text('OK! Have a great day', call.message.chat.id, call.message.message_id)
+    elif call.data == 'legendary':
+        handle_legendary(call)
+    elif call.data == 'ol':
+        handle_non_legendary(call)
+    elif call.data == 'shiny':
+        handle_shiny(call)
+    elif call.data == 'tms':
+        handle_tms(call)
+    elif call.data == 'submit':
+        submit_item(call)
+    elif call.data == 'delete':
+        bot.edit_message_text("RESPONSE DELETED", call.message.chat.id, call.message.message_id)
+    elif call.data == 'submi':
+        submit_tm(call)
+    elif call.data == 'delet':
+        bot.edit_message_text("RESPONSE DELETED", call.message.chat.id, call.message.message_id)
+    elif call.data in ['approve', 'reject', 'rejtrash', 'rejinco', 'highbase', 'scammer']:
+        handle_admin_actions(call)
+
+def handle_legendary(call):
+    bot.edit_message_text('OK! Legendary', call.message.chat.id, call.message.message_id)
+    bot.send_message(call.from_user.id, 'Forward Nature Pic of pokemon')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_nature_pic, 'legendary')
+
+def handle_non_legendary(call):
+    bot.edit_message_text('OK! NON Legendary', call.message.chat.id, call.message.message_id)
+    bot.send_message(call.from_user.id, 'Forward Nature Pic of pokemon')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_nature_pic, 'non_legendary')
+
+def handle_shiny(call):
+    bot.edit_message_text('OK! Shiny', call.message.chat.id, call.message.message_id)
+    bot.send_message(call.from_user.id, 'Forward Nature Pic of pokemon')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_nature_pic, 'shiny')
+
+def handle_tms(call):
+    bot.edit_message_text('OK! TMS', call.message.chat.id, call.message.message_id)
+    bot.send_message(call.from_user.id, 'Forward TM')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_tm, 'tm')
+
+def process_nature_pic(message, item_type):
+    if message.photo:
+        bot.send_message(message.chat.id, 'Forward Evs Pic of pokemon')
+        bot.register_next_step_handler(message, process_evs_pic, item_type, message.caption)
+    else:
+        bot.send_message(message.chat.id, "An error occurred, please restart the process. Please forward the pic with nature too. If the pic isn't present, an error will happen again")
+
+def process_evs_pic(message, item_type, nature):
+    if message.photo:
+        bot.send_message(message.chat.id, 'Forward moveset pic of pokemon')
+        bot.register_next_step_handler(message, process_moveset_pic, item_type, nature, message.caption)
+    else:
+        bot.send_message(message.chat.id, "An error occurred, please restart the process. Please forward the pic with evs and ivs too. If the pic isn't present, an error will happen again")
+
+def process_moveset_pic(message, item_type, nature, evs):
+    if message.photo:
+        bot.send_message(message.chat.id, 'IS ANY STAT BOOSTED? (Answer in only 1 message)')
+        bot.register_next_step_handler(message, process_boosted_stat, item_type, nature, evs, message.caption)
+    else:
+        bot.send_message(message.chat.id, "An error occurred, please restart the process. Please forward the pic with moveset too. If the pic isn't present, an error will happen again")
+
+def process_boosted_stat(message, item_type, nature, evs, moveset):
+    boosted = message.text
+    bot.send_message(message.chat.id, 'Set base')
+    bot.register_next_step_handler(message, process_base, item_type, nature, evs, moveset, boosted)
+
+def process_base(message, item_type, nature, evs, moveset, boosted):
+    base = message.text
+    user_id = message.chat.id
+    text = f"#{item_type.capitalize()}\nUser id - {user_id}\nUsername : @{message.from_user.username}\n\nAbout Pokemon:- \n{nature}\nEvs and Ivs:-\n{evs}\nMoveset:- \n{moveset}\nBoosted - \n{boosted}\n\nBase - {base}"
+    user_cache[user_id] = {'text': text}
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submit'))
+    markup.add(types.InlineKeyboardButton('Delete', callback_data='delete'))
+    bot.send_message(user_id, text, reply_markup=markup)
+
+def process_tm(message, item_type):
+    name = message.text
+    bot.send_message(message.chat.id, 'ENTER BASE')
+    bot.register_next_step_handler(message, process_tm_base, name)
+
+def process_tm_base(message, name):
+    base = message.text
+    user_id = message.chat.id
+    text = f"#TMS\nUser id - {user_id}\nUsername : @{message.from_user.username}\n\nAbout TM:- \n{name}\n\nBase - {base}"
+    user_cache[user_id] = {'text': text}
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submi'))
+    markup.add(types.InlineKeyboardButton('Delete', callback_data='delet'))
+    bot.send_message(user_id, text, reply_markup=markup)
+
+def submit_item(call):
+    user_id = call.from_user.id
+    text = user_cache[user_id]['text']
+    bot.send_message(call.message.chat.id, text + "\n\nSUBMITTED\nUsually it takes 3-4 hours to get accepted or rejected, Check the buttons below", reply_markup=types.InlineKeyboardMarkup().add(types.InlineKeyboardButton('AUCTION GROUP', url=AUCTION_GROUP_LINK)))
+    bot.send_message(log_channel, text, reply_markup=types.InlineKeyboardMarkup().add(types.InlineKeyboardButton('APPROVE', callback_data='approve'),
+                                                                                      types.InlineKeyboardButton('REJECT', callback_data='reject'),
+                                                                                      types.InlineKeyboardButton('REJECT TRASH', callback_data='rejtrash'),
+                                                                                      types.InlineKeyboardButton('REJECT INCOMPLETE', callback_data='rejinco'),
+                                                                                      types.InlineKeyboardButton('REJECT HIGHBASE', callback_data='highbase'),
+                                                                                      types.InlineKeyboardButton('REPORT AS SCAMMER', callback_data='scammer')))
+
+def submit_tm(call):
+    user_id = call.from_user.id
+    text = user_cache[user_id]['text']
+    bot.send_message(call.message.chat.id, text + "\n\nSUBMITTED\nUsually it takes 3-4 hours to get accepted or rejected, Check the buttons below", reply_markup=types.InlineKeyboardMarkup().add(types.InlineKeyboardButton('AUCTION GROUP', url=AUCTION_GROUP_LINK)))
+    bot.send_message(log_channel, text, reply_markup=types.InlineKeyboardMarkup().add(types.InlineKeyboardButton('APPROVE', callback_data='approve'),
+                                                                                      types.InlineKeyboardButton('REJECT', callback_data='reject'),
+                                                                                      types.InlineKeyboardButton('REJECT TRASH', callback_data='rejtrash'),
+                                                                                      types.InlineKeyboardButton('REJECT INCOMPLETE', callback_data='rejinco'),
+                                                                                      types.InlineKeyboardButton('REJECT HIGHBASE', callback_data='highbase'),
+                                                                                      types.InlineKeyboardButton('REPORT AS SCAMMER', callback_data='scammer')))
+
+def handle_admin_actions(call):
+    user_id = call.from_user.id
+    if user_id in xmods:
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
+        if call.data == 'approve':
+            bot.forward_message(post_channel, log_channel, call.message.message_id)
+            bot.forward_message(approve_channel, log_channel, call.message.message_id)
+            bot.send_message(approve_channel, f"Accepted by @{call.from_user.username}")
+        else:
+            reject_message = {
+                'reject': f"Rejected by @{call.from_user.username}",
+                'rejtrash': f"Rejected as trash by @{call.from_user.username}",
+                'rejinco': f"Rejected due to incomplete details by @{call.from_user.username}",
+                'highbase': f"Rejected due to high base by @{call.from_user.username}",
+                'scammer': f"Reported as scammer by @{call.from_user.username}"
+            }
+            bot.forward_message(reject_channel, log_channel, call.message.message_id)
+            bot.send_message(reject_channel, reject_message[call.data])
+        bot.delete_message(log_channel, call.message.message_id)
+    else:
+        bot.answer_callback_query(call.id, 'You are not the auctioneer', show_alert=True)
+
+
+
 @bot.message_handler(commands=['msg'])
 def handle_msg(message):
     if str(message.from_user.id) in banned_users:
