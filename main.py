@@ -484,12 +484,6 @@ def handle_cmds(message):
 —————————————————————————                     
 • /clear :- For bot owner (OWNER)''')
 
-admin_ids = {
- 1661129466
- 6468596992
- 6241067084
- 1655924853
-}
 
 @bot.message_handler(commands=['admin'])
 def handle_admins(message):
