@@ -1,257 +1,692 @@
-from telethon import TelegramClient, events
-import random
+#7012523159:AAFFb5hWOdliq8Mti2vpxAKemvWS_rSA_J8
+#https://wallpapers.com/images/hd/legendary-pokemon-pictures-7yo7x0f1l2b2tu0r.jpg
+#https://t.me/IHG_Hexa_Auction
+#https://t.me/IHGtradegroup
+
+import telebot
+from telebot import types
+import time
 import re
-from telethon.tl.functions.channels import GetParticipantsRequest
-import os
-from telethon.tl.functions.channels import GetParticipantsRequest
-from telethon.tl.types import ChannelParticipantsSearch
-from time import sleep
-from telethon.tl.types import MessageEntityCode
-from telethon import TelegramClient, events, Button
-import telethon.sync #lol copied from docs
-import asyncio
-import logging
-import asyncio
-from telethon import events
-from telethon.errors import UserNotParticipantError
-from telethon.tl.functions.channels import GetParticipantRequest
-from telethon.tl.types import ChannelParticipantAdmin
-from telethon.tl.types import ChannelParticipantCreator
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InputMediaPhoto
 
-from telethon.tl.types import ChannelParticipantsAdmins
+API_TOKEN = '7078628340:AAFxo2fP959VA44yDOXOoAG5d5wNzfA9tE4'
 
-api_id = '28184846'
-api_hash = 'b79094c50e87edb77def9e04dcff3aa5'
-admin_ids = ['6265981509', '1661129466', '6468596992','5925882832','5232742343','6301771663','1483217059']
-allowed_group_id = -1001940203596
-BOT_TOKEN = '6899547930:AAEw0hcXWkXw3FNAVPzhGr6769dtm9mcC5Y'
-client = TelegramClient('bot_username', api_id, api_hash)
-spam_chats = []
+bot = telebot.TeleBot(API_TOKEN)
 
+user_join_status = {}
+user_states = {}
+started_users = set()
+banned_users = set()
+broad_users = []
 
-name = 'main'
-auction_mode = False  
+def send_welcome_message(chat_id, username, first_name):
+    markup = types.InlineKeyboardMarkup()
+    join_auction_btn = types.InlineKeyboardButton("Join Auction", url=f"https://t.me/phg_hexa")
+    join_trade_btn = types.InlineKeyboardButton("Join Trade", url=f"https://t.me/phg_hexa_group")
+    joined_btn = types.InlineKeyboardButton("Joined", callback_data="joined")
 
-@client.on(events.NewMessage(pattern='/auction on'))
-async def auction_on_handler(event):
-    global auction_mode
-    auction_mode = True
+    markup.add(join_auction_btn, join_trade_btn)
+    markup.add(joined_btn)
 
+    caption = (
+        f"🔸Welcome, [{first_name}](https://t.me/{username}) To PHG Auction Bot\n\n"
+        "🔸You Can Submit Your Pokemon Through This Bot For Auction\n\n"
+        "🔻But Before Using You Have To Join Our Auction Group By Clicking Below Two Buttons And Then Click 'Joined' Button"
+    )
 
+    bot.send_photo(
+        chat_id,
+        photo="https://wallpapers.com/images/hd/legendary-pokemon-pictures-7yo7x0f1l2b2tu0r.jpg",
+        caption=caption,
+        reply_markup=markup,
+        parse_mode='Markdown'
+    )
 
-@client.on(events.NewMessage)
-async def check_message(event):
-    global auction_mode
-    if auction_mode and event.chat_id == allowed_group_id:
-       
-        if re.match(r'^(\d+(\.\d+)?|(\d+)?(pd|k|/pass))$', event.message.text.lower()) or event.message.text.strip() == '.':
-           
-            return
-
-       
-        admins = await client.get_participants(event.chat_id, filter=ChannelParticipantsAdmins)
-        admin_ids = [admin.id for admin in admins] 
-
-        
-        if event.sender_id in admin_ids:
-        
-            return
+@bot.message_handler(commands=['start'])
+def handle_start(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.chat.type == 'private':
+            user_id = message.chat.id
+            if user_id not in broad_users:
+                broad_users.append(user_id)
+            first_name = message.from_user.first_name
+            username = message.from_user.username
+            send_welcome_message(message.chat.id, username, first_name)
         else:
- 
-            await event.delete()
-@client.on(events.NewMessage(pattern='/auction off'))
-async def auction_off_handler(event):
-    global auction_mode
-    
-    admins = await client.get_participants(event.chat_id, filter=ChannelParticipantsAdmins)
-    admin_ids = [admin.id for admin in admins] 
-    auction_mode = False
+            bot.reply_to(message, "Please use this command in a private message.")
 
-dot_count = 0
+@bot.callback_query_handler(func=lambda call: call.data == "joined")
+def handle_joined(call):
+    user_id = call.from_user.id
 
-
-import asyncio
-
-
-@client.on(events.NewMessage)
-async def auto_count_handler(event):
-    
-    if event.chat_id != allowed_group_id or not auction_mode:
-        return
-
-    message_text = event.message.text.strip()
-
-    if message_text == '.' and str(event.sender_id) in admin_ids:
-       
-        sent_message = await event.reply('✨')
-        await asyncio.sleep(1)  
-
-        
-        await sent_message.edit('✨✨')
-        await asyncio.sleep(2)  
-
-        await sent_message.edit('✨✨✨')
-        await asyncio.sleep(2) 
-
-       
-        await sent_message.edit('✨✨✨✨')
-      
-        await asyncio.sleep(1)  
-        await sent_message.edit('✨✨✨✨✨ /sold ')
-
-from telethon.tl.types import ChannelParticipantsAdmins
-
-
-@client.on(events.NewMessage(pattern='/sold'))
-async def sold_handler(event):
-    
-    if not event.is_reply:
-        await event.reply("Please use the /sold command by replying to the message of the item.")
-        return
-
-    
-    custom_message = event.message.text.partition(' ')[2].strip()
-
-   
-    admins = await client.get_participants(event.chat_id, filter=ChannelParticipantsAdmins)
-    admin_ids = [admin.id for admin in admins] 
-
-    if event.sender_id not in admin_ids:
-        await event.reply("You are not authorized to use the /sold command.")
-        return
-
-    
-    replied_message = await event.get_reply_message()
-
-    
-    user_identifier = "@" + replied_message.sender.username if replied_message.sender.username else replied_message.sender_id
-
-    
-    replied_message_content = replied_message.text
-
-    
-    sold_message = f"sold to :- {user_identifier} \n \n sold in :- {replied_message_content} k: {custom_message}"
-
-   
-    sold_reply = await replied_message.reply(sold_message)
-
-    
-    await client.pin_message(event.chat_id, sold_reply.id)
-
-
-@client.on(events.NewMessage(pattern='/unsold'))
-async def unsold_handler(event):
-    
-    admins = await client.get_participants(event.chat_id, filter=ChannelParticipantsAdmins)
-    admin_ids = [admin.id for admin in admins]  
-
-    if event.sender_id not in admin_ids:
-        await event.reply("You are not authorized to use the /unsold command.")
-        return
-
-    
-    player_name = event.message.text.partition(' ')[2].strip()
-
-    
-    if player_name:
-       
-        unsold_message = f" {  player_name} was unsold"
-
-        
-        await event.reply(unsold_message)
-    else:
-        await event.reply("Please provide the player's name in the /unsold command.")
-
-
-@client.on(events.NewMessage(pattern="^/tagall|@all|/mention|/all ?(.*)"))
-async def mentionall(event):
-    chat_id = event.chat_id
-    if event.is_private:
-        return await event.respond(
-            "__This command can be use in groups and channels!__"
-        )
-
-    is_admin = False
     try:
-        partici_ = await client(GetParticipantRequest(event.chat_id, event.sender_id))
-    except UserNotParticipantError:
-        is_admin = False
-    else:
-        if isinstance(
-            partici_.participant, (ChannelParticipantAdmin, ChannelParticipantCreator)
-        ):
-            is_admin = True
-    if not is_admin:
-        return await event.reply("__Only admins can mention all!__")
-
-    if event.pattern_match.group(1) and event.is_reply:
-        return await event.reply("__Give me one argument!__")
-    elif event.pattern_match.group(1):
-        mode = "text_on_cmd"
-        msg = event.pattern_match.group(1)
-    elif event.is_reply:
-        mode = "text_on_reply"
-        msg = await event.get_reply_message()
-        if msg == None:
-            return await event.respond(
-                "__I can't mention members for older messages! (messages which are sent before I'm added to group)__"
-            )
-    else:
-        return await event.reply(
-            "__Reply to a message or give me some text to mention others!__"
-        )
-
-    spam_chats.append(chat_id)
-    usrnum = 0
-    usrtxt = ""
-    async for usr in client.iter_participants(chat_id):
-        if not chat_id in spam_chats:
-            break
-        usrnum += 1
-        usrtxt += f" 🎶 [{usr.first_name}](tg://user?id={usr.id}), \n \n"
-        if usrnum == 5:
-            if mode == "text_on_cmd":
-                txt = f"{msg}\n{usrtxt}"
-                await client.send_message(chat_id, txt)
-            elif mode == "text_on_reply":
-                await msg.reply(usrtxt)
-            await asyncio.sleep(2)
-            usrnum = 0
-            usrtxt = ""
-    try:
-        spam_chats.remove(chat_id)
+        auction_status = bot.get_chat_member(chat_id="@IHGtradegroup", user_id=user_id).status
+        trade_status = bot.get_chat_member(chat_id="@IHG_Hexa_Auction", user_id=user_id).status 
+        has_joined_auction = auction_status in ['member', 'administrator', 'creator']
+        has_joined_trade = trade_status in ['member', 'administrator', 'creator']
     except:
-        pass
+        has_joined_auction = False 
+        has_joined_trade = False 
+
+    if has_joined_auction and has_joined_trade:
+        bot.edit_message_caption(
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            caption="Thanks for joining our groups 😊")
+
+@bot.message_handler(commands=['cancel'])
+def handle_cancel(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.chat.type == 'private':
+            user_id = message.from_user.id
+            if user_id in user_states:
+                del user_states[user_id] 
+            bot.send_message(message.chat.id, "All Running Command Has Been Cancelled ✅")
+        else:
+            bot.reply_to(message, "Please use this command in a private message.")
 
 
-@client.on(events.NewMessage(pattern="^/cancel$"))
-async def cancel_spam(event):
-    is_admin = False
-    try:
-        partici_ = await client(GetParticipantRequest(event.chat_id, event.sender_id))
-    except UserNotParticipantError:
-        is_admin = False
+def is_admin(user_id):
+    admin_ids = [6882194604, 6076549174, 6545380269, 1257427765, 1483217059, 5925882832, 6301771663] 
+    return user_id in admin_ids
+
+admin_id = [6882194604, 6076549174, 6301771663, 5925882832] 
+
+@bot.message_handler(commands=['msg'])
+def handle_msg(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
     else:
-        if isinstance(
-            partici_.participant, (ChannelParticipantAdmin, ChannelParticipantCreator)
-        ):
-            is_admin = True
-    if not is_admin:
-        return await event.reply("__Only admins can execute this command!__")
-    if not event.chat_id in spam_chats:
-        return await event.reply("__There is no proccess on going...__")
-    else:
+        if message.from_user.id not in str(admin_id):
+            bot.reply_to(message, "You are not authorized to use this command.")
+            return
+
         try:
-            spam_chats.remove(event.chat_id)
-        except:
-            pass
-        return await event.respond("__Stopped Mention.__")
+            _, user_id, user_message = message.text.split(maxsplit=2)
+            user_id = int(user_id)
+        except ValueError:
+            bot.reply_to(message, "Invalid syntax. Use /msg (user_id) (message)")
+            return
+
+        try:
+            bot.send_message(user_id, user_message)
+            bot.reply_to(message, f"Message sent to user {user_id}")
+        except Exception as e:
+            bot.reply_to(message, f"Failed to send message to user {user_id}: {e}")
+
+admin_ids_broad = ["6882194604", "6076549174", "6301771663", "5925882832"]
+
+@bot.message_handler(commands=['broad'])
+def broadcast(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        user_id = message.chat.id
+        if str(user_id) in admin_ids_broad:
+            if len(message.text.split()) >= 2:
+                broadcast_message = ' '.join(message.text.split()[1:])
+                for user_id in broad_users:
+                    bot.send_message(user_id, broadcast_message)
+                bot.reply_to(message, "Broadcast sent to all users.")
+            else:
+                bot.reply_to(message, "Please provide a message to broadcast using the syntax /broad (message).")
+        else:
+            bot.reply_to(message, "You're not authorized to perform this action.")
+
+group_id = -1002021868341
+
+@bot.message_handler(commands=['forward'])
+def send_message_prompt(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if is_admin(message.from_user.id):
+            bot.reply_to(message, "Type the message to send in the group")
+            bot.register_next_step_handler(message, send_message)
+        else:
+            bot.reply_to(message, "Only admins can perform this action.")
+
+def send_message(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.forward_from or message.forward_from_chat:
+            forwarded_message = message
+        else:
+            forwarded_message = message.text
+        try:
+            bot.forward_message(group_id, message.chat.id, message.id)
+            bot.send_message(message.chat.id, "Message sent successfully.")
+        except Exception as e:
+            bot.send_message(message.chat.id, f"Failed to send message: {e}")
+
+@bot.message_handler(commands=['ban'])
+def handle_ban(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if str(message.from_user.id) not in str(admin_id):
+            bot.reply_to(message, "You are not authorized to use this command.")
+            return
+
+        try:
+            _, user_id = message.text.split(maxsplit=1)
+            banned_users.add(user_id)  
+            bot.reply_to(message, f"User with ID {user_id} has been banned.")
+        except ValueError:
+            bot.reply_to(message, "Invalid syntax. Use /ban <user_id>")
+
+
+@bot.message_handler(commands=['unban'])
+def handle_unban(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if str(message.from_user.id) not in str(admin_id):
+            bot.reply_to(message, "You are not authorized to use this command.")
+            return
+        try:
+            _, user_id = message.text.split(maxsplit=1)
+            if user_id in banned_users:
+                banned_users.remove(user_id) 
+                bot.reply_to(message, f"User with ID {user_id} has been unbanned.")
+            else:
+                bot.reply_to(message, f"User with ID {user_id} is not banned.")
+        except ValueError:
+            bot.reply_to(message, "Invalid syntax. Use /unban <user_id>")
+
+@bot.message_handler(commands=['users'])
+def handle_users(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        user_id = message.from_user.id
+        if str(user_id) in str(admin_id):
+            num_users = len(started_users)
+            bot.send_message(message.chat.id, f"Total users : {num_users}")
+        else:
+            bot.send_message(message.chat.id, "You are not authorized to use this command.")
+
+nature_info = {
+    "adamant": {"increase": "Attack", "decrease": "Special Attack"},
+    "bashful": {"increase": "none", "decrease": "none"},
+    "bold": {"increase": "Defense", "decrease": "Attack"},
+    "brave": {"increase": "Attack", "decrease": "Speed"},
+    "calm": {"increase": "Special Defense", "decrease": "Attack"},
+    "careful": {"increase": "Special Defense", "decrease": "Special Attack"},
+    "docile": {"increase": "none", "decrease": "none"},
+    "gentle": {"increase": "Special Defense", "decrease": "Defense"},
+    "hardy": {"increase": "none", "decrease": "none"},
+    "hasty": {"increase": "Speed", "decrease": "Defense"},
+    "impish": {"increase": "Defense", "decrease": "Special Attack"},
+    "jolly": {"increase": "Speed", "decrease": "Special Attack"},
+    "lax": {"increase": "Defense", "decrease": "Special Defense"},
+    "lonely": {"increase": "Attack", "decrease": "Defense"},
+    "mild": {"increase": "Special Attack", "decrease": "Defense"},
+    "modest": {"increase": "Special Attack", "decrease": "Attack"},
+    "naive": {"increase": "Speed", "decrease": "Special Defense"},
+    "naughty": {"increase": "Attack", "decrease": "Special Defense"},
+    "quiet": {"increase": "Special Attack", "decrease": "Speed"},
+    "quirky": {"increase": "none", "decrease": "none"},
+    "rash": {"increase": "Special Attack", "decrease": "Special Defense"},
+    "relaxed": {"increase": "Defense", "decrease": "Speed"},
+    "sassy": {"increase": "Special Defense", "decrease": "Speed"},
+    "serious": {"increase": "none", "decrease": "none"},
+    "timid": {"increase": "Speed", "decrease": "Attack"}
+}
+
+@bot.message_handler(func=lambda message: message.text.lower() in nature_info)
+def handle_nature(message):
+    nature_name = message.text.lower()
+    info = nature_info[nature_name]
+    response = f"Nature : {nature_name.capitalize()}\n\n▪️ Effects :\n\n"
+    response += f"🔺 Stats Increase + : {info['increase']}\n"
+    response += f"🔻 Stats Decrease - : {info['decrease']}\n"
+    bot.reply_to(message, response)
+
+@bot.message_handler(commands=['natures'])
+def natures(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        response = "Nature Types:\n"
+        for nature in nature_info:
+            response += f"- {nature}\n"
+        bot.reply_to(message, response)
+
+user_groups = {}
+
+@bot.message_handler(commands=['commands'])
+def handle_cmds(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        user_id = message.from_user.id
+        bot.reply_to(message, '''
+                     Users Commands :-
+—————————————————————————
+• /start - Start The Bot
+• /add - Send Poke / TMs / Teams For Next Auction
+• /cancel - Cancel All Running Commands Like add
+• /item - Get List Of All Items Which Are In Next Auction
+• /myitem - Get List Of Your All Items Which Are In Next Auction
+• /seller <item> - Get A Specific Item Owner Username Of Previous Auction
+• /sellerinfo - Info For seller Command
+• /sellers - Get All Items Sellers List Are In Previous Auction
+• /profile - Get Details About You 
+• /admin - Get Bot All Admins List
+• /help - Get Some Question With Answers Related To Auction
+• /commands - Get This Message
+• /buyers - Get List Of All Buyers Username In Previous Auction
+• /natures - Get All Natures List
+• /tm00 - Get A TM Details (Replace 00 With Tm Number) 
+• /host - Create Your Own Auction Bot
+                         
+                         Admin commands :-
+—————————————————————————
+• /current - Get Current ITEMS Number In Auction (ADMIN)
+• /list :- Get All Poke / Tms In Auction (ADMIN)
+• /sold :- Sold Messenger (ADMIN)
+• /unsold :-  Unsold messenger (ADMIN)
+• /ban :- Ban Any User (ADMIN)
+• /unban :- Unban Any User (ADMIN)
+• /users :- Get all List Of users (ADMIN)
+• /buyers :- Get All The Buyers Username From Latest Auction (ADMIN)
+• /forward :- Forward a Message To All Users (ADMIN)
+• /broad :- Send Message To All Bot
+• /msg :- Send Message To User (ADMIN)
+• /approve :- Make User Admin In Bot (ADMIN)
+• /next :- Send next item in auction (ADMIN)
+                     
+                     Owner commands :-
+—————————————————————————                     
+• /clear :- For bot owner (OWNER)''')
+
+admin_ids = {
+    6882194604: 'ᴰᴮᴬ ᴢᴇɴɪᴛꜱᴜ',
+    6076549174: 'ARYAN NISHAD ᴵᴴᴳ',
+    6301771663: 'ʀ𝙴ᴢ𝚆∆ɴ',
+    5925882832: 'ᴵᴴᴳ╰‿╯. ꜱʜᴇɪᴋʜ ꜱʜΔʜɪᴅ'
+}
+
+@bot.message_handler(commands=['admin'])
+def handle_admins(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        response = "Bot Administrators:\n\n"
+        response += "\n".join([f"• {name} ✨" for name in admin_ids.values()])
+        bot.reply_to(message, response, parse_mode='Markdown')
+
+@bot.message_handler(commands=['help'])
+def handle_help(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.chat.type == 'private':
+            bot.reply_to(message, "How can I help you?")
+            bot.register_next_step_handler(message, process_help_request)
+        else:
+            bot.reply_to(message, "Please use the /help command in a private message.")
+
+def process_help_request(message):
+    user_id = message.from_user.id
+    help_text = message.text
+    response = "Your help request has been submitted to admins."
+    bot.reply_to(message, response)
+
+    forward_to_admins(user_id, help_text)
+
+def forward_to_admins(user_id, help_text):
+    for admin_id in admin_ids:
+        bot.send_message(admin_id, f"Help request from user {user_id}:\n\n{help_text}")
+
+pokemon_names = ["Pikachu", "Charmander", "Bulbasaur"]
+pokemon_levels = [10, 20, 30]
+
+message_store = {}
+previous_dot_message = {}
+current_index = 0
+sold_items = []
+confirmed_messages = set()
+
+def get_next_pokemon():
+    global current_index
+    name = pokemon_names[current_index]
+    level = pokemon_levels[current_index]
+    current_index = (current_index + 1) % len(pokemon_names)
+    return name, level
+
+@bot.message_handler(func=lambda message: message.text == "." and message.from_user.id in admin_ids)
+def handle_dot(message):
+    chat_id = message.chat.id
+
+    if chat_id in previous_dot_message:
+        prev_msg_id = previous_dot_message[chat_id]
+        if prev_msg_id not in confirmed_messages:
+            try:
+                bot.delete_message(chat_id, prev_msg_id)
+            except Exception as e:
+                print(f"Failed to delete message: {e}")
+
+    msg = bot.reply_to(message, "•")
+    previous_dot_message[chat_id] = msg.message_id 
+
+    time.sleep(1.5)
+    bot.edit_message_text("• •", chat_id, msg.message_id)
+    time.sleep(1.5)
+    bot.edit_message_text("• • •", chat_id, msg.message_id)
+    time.sleep(1.5)
     
+    reply_username = message.reply_to_message.from_user.username if message.reply_to_message else "Unknown"
+    reply_text = message.reply_to_message.text if message.reply_to_message else "Unknown"
 
-async def main():
-    await client.start(bot_token=BOT_TOKEN)
-    await client.run_until_disconnected()
+    if not re.match(r'^\d+(k|pd)?$', reply_text):
+        bot.reply_to(message, "Invalid format. Please enter a valid integer value (e.g., 1, 2, 1k, 2pd).")
+        return
+
+    confirmation_text = f"Sure Sell To @{reply_username} For {reply_text}?"
+
+    keyboard = types.InlineKeyboardMarkup()
+    yes_button = types.InlineKeyboardButton(text="yes", callback_data=f"sell_pokemon_{chat_id}_{msg.message_id}")
+    keyboard.add(yes_button)
+    bot.edit_message_text(confirmation_text, chat_id, msg.message_id, reply_markup=keyboard)
+
+    message_store[f"{chat_id}_{msg.message_id}"] = message
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("sell_pokemon_"))
+def handle_sell_pokemon(call):
+    if call.from_user.id not in admin_ids:
+        bot.answer_callback_query(call.id, text="🖕")
+        return
+
+    data = call.data.split("_")
+    chat_id = int(data[2])
+    message_id = int(data[3])
+
+    confirmed_messages.add(message_id)
+
+    original_message = message_store.get(f"{chat_id}_{message_id}")
+    if not original_message:
+        bot.answer_callback_query(call.id, "Original message not found.")
+        return
+
+    pokemon_name, pokemon_level = get_next_pokemon()
+
+    reply_username = original_message.reply_to_message.from_user.username if original_message.reply_to_message else "Unknown"
+    reply_text = original_message.reply_to_message.text if original_message.reply_to_message else "Unknown"
+
+    sell_message = f"🔊 {pokemon_name} (Level {pokemon_level}) Has Been Sold\n\n"
+    sell_message += f"🔸 Sold To -- @{reply_username}\n"
+    sell_message += f"🔸 Sold For -- {reply_text}\n\n"
+    sell_message += "❗ Join <a href='https://t.me/IHGtradegroup'>Trade Group</a> To Get Seller Username After Auction"
+
+    bot.edit_message_text(sell_message, call.message.chat.id, call.message.message_id, parse_mode="HTML", disable_web_page_preview=True)
+
+    bot.pin_chat_message(call.message.chat.id, call.message.message_id)
+
+    sold_items.append((pokemon_name, reply_username, reply_text))
+
+@bot.message_handler(commands=['sold'])
+def handle_sold(message):
+    if message.from_user.id in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.from_user.id in admin_ids:
+            try:
+                command, *args = message.text.split(' ', 1)
+                if len(args) != 1:
+                    raise ValueError
+                pokemon_name = args[0]
+                username = message.reply_to_message.from_user.username
+                amount = message.reply_to_message.text
+                reply_message = f"🔊 {pokemon_name} Has Been Sold\n\n🔸Sold to - @{username}\n🔸Sold for - {amount}\n\n❗ Join Trade Group To Get Seller Username After Auction"
+                sent_message = bot.reply_to(message, reply_message)
+                bot.pin_chat_message(message.chat.id, sent_message.id)
+
+                sold_items.append((pokemon_name, username, amount))
+
+            except ValueError:
+                bot.reply_to(message, "Please provide the command in the format /sold (pokemon name)")
+        else:
+            bot.reply_to(message, "You are not authorized to use this command.")
 
 
-if name == 'main':
-    client.loop.run_until_complete(main())
+@bot.message_handler(commands=['unsold'])
+def handle_unsold(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if is_admin(message.from_user.id):
+            try:
+                pokemon_name = message.text.split(' ', 1)[1]
+                reply_message = f"❌ {pokemon_name} Has Been Unsold"
+                sent_message = bot.reply_to(message, reply_message)
+                bot.pin_chat_message(message.chat.id, sent_message.id) 
+            except IndexError:
+                bot.reply_to(message, "Please provide the name of the Pokemon to mark as unsold.")
+        else:
+            bot.reply_to(message, "You are not authorized to use this command.")
+
+stored_messages = {}
+
+@bot.message_handler(commands=['store'])
+def store_message_prompt(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if is_admin(message.from_user.id):
+            bot.reply_to(message, "Type the message you want to store:")
+            bot.register_next_step_handler(message, store_message)
+        else:
+            bot.reply_to(message, "Only admins can perform this action.")
+
+def store_message(message):
+    stored_messages[message.message_id] = {"message": message.text, "chat_id": message.chat.id}
+    bot.reply_to(message, "Message stored successfully.")
+
+@bot.message_handler(commands=['next'])
+def next_message(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if is_admin(message.from_user.id):
+            if stored_messages:
+                next_message_id = next(iter(stored_messages))
+                next_message_data = stored_messages.pop(next_message_id)
+                bot.forward_message(message.chat.id, next_message_data["chat_id"], next_message_id)
+            else:
+                bot.reply_to(message, "No more Posts To Forward")
+        else:
+            bot.reply_to(message, "Only admins can perform this action.")
+
+tm_data = {
+    2: {"name": "Dragon Claw", "power": 80, "accuracy": 100, "category": "P"},
+    3: {"name": "Psyshock", "power": 80, "accuracy": 100, "category": "S"},
+    9: {"name": "Venoshock", "power": 65, "accuracy": 100, "category": "S"},
+    10: {"name": "Hidden Power", "power": 60, "accuracy": 100, "category": "S"},
+    13: {"name": "Ice Beam", "power": 90, "accuracy": 100, "category": "S"},
+    14: {"name": "Blizzard", "power": 110, "accuracy": 70, "category": "S"},
+    15: {"name": "Hyper Beam", "power": 150, "accuracy": 90, "category": "S"},
+    22: {"name": "Solar Beam", "power": 120, "accuracy": 100, "category": "S"},
+    23: {"name": "Smack Down", "power": 50, "accuracy": 100, "category": "P"},
+    24: {"name": "Thunderbolt", "power": 90, "accuracy": 100, "category": "S"},
+    25: {"name": "Thunder", "power": 110, "accuracy": 70, "category": "P"},
+    26: {"name": "Earthquake", "power": 100, "accuracy": 100, "category": "P"},
+    28: {"name": "Leech Life", "power": 80, "accuracy": 100, "category": "P"},
+    29: {"name": "Psychic", "power": 90, "accuracy": 100, "category": "S"},
+    30: {"name": "Shadow Ball", "power": 80, "accuracy": 100, "category": "S"},
+    31: {"name": "Brick Break", "power": 75, "accuracy": 100, "category": "P"},
+    34: {"name": "Sludge Wave", "power": 95, "accuracy": 100, "category": "S"},
+    35: {"name": "Flamethrower", "power": 90, "accuracy": 100, "category": "S"},
+    36: {"name": "Sludge Bomb", "power": 90, "accuracy": 100, "category": "S"},
+    38: {"name": "Fire Blast", "power": 110, "accuracy": 85, "category": "S"},
+    39: {"name": "Rock Tomb", "power": 60, "accuracy": 95, "category": "P"},
+    40: {"name": "Aerial Ace", "power": 60, "accuracy": 100, "category": "P"},
+    42: {"name": "Facade", "power": 70, "accuracy": 100, "category": "P"},
+    43: {"name": "Flame Charge", "power": 50, "accuracy": 100, "category": "P"},
+    46: {"name": "Thief", "power": 60, "accuracy": 100, "category": "P"},
+    47: {"name": "Low Sweep", "power": 65, "accuracy": 100, "category": "P"},
+    48: {"name": "Round", "power": 60, "accuracy": 100, "category": "S"},
+    49: {"name": "Echoed Voice", "power": 40, "accuracy": 100, "category": "S"},
+    50: {"name": "Overheat", "power": 130, "accuracy": 90, "category": "S"},
+    51: {"name": "Steel Wing", "power": 70, "accuracy": 90, "category": "P"},
+    52: {"name": "Focus Blast", "power": 120, "accuracy": 70, "category": "S"},
+    53: {"name": "Energy Ball", "power": 90, "accuracy": 100, "category": "S"},
+    54: {"name": "False Swipe", "power": 40, "accuracy": 100, "category": "P"},
+    55: {"name": "Scald", "power": 80, "accuracy": 100, "category": "S"},
+    57: {"name": "Charge Beam", "power": 50, "accuracy": 90, "category": "S"},
+    58: {"name": "Sky Drop", "power": 60, "accuracy": 100, "category": "P"},
+    59: {"name": "Brutal Swing", "power": 60, "accuracy": 100, "category": "P"},
+    62: {"name": "Acrobatics", "power": 55, "accuracy": 100, "category": "P"},
+    65: {"name": "Shadow Claw", "power": 70, "accuracy": 100, "category": "P"},
+    66: {"name": "Payback", "power": 50, "accuracy": 100, "category": "P"},
+    67: {"name": "Smart Strike", "power": 70, "accuracy": 100, "category": "P"},
+    68: {"name": "Giga Impact", "power": 150, "accuracy": 90, "category": "P"},
+    71: {"name": "Stone Edge", "power": 100, "accuracy": 80, "category": "P"},
+    72: {"name": "Volt Switch", "power": 70, "accuracy": 100, "category": "S"},
+    76: {"name": "Fly", "power": 90, "accuracy": 95, "category": "P"},
+    78: {"name": "Bulldoze", "power": 60, "accuracy": 100, "category": "P"},
+    79: {"name": "Frost Breath", "power": 60, "accuracy": 90, "category": "S"},
+    80: {"name": "Rock Slide", "power": 75, "accuracy": 90, "category": "P"},
+    81: {"name": "X-Scissor", "power": 80, "accuracy": 100, "category": "P"},
+    82: {"name": "Dragon Tail", "power": 60, "accuracy": 90, "category": "P"},
+    83: {"name": "Infestation", "power": 70, "accuracy": 100, "category": "S"},
+    84: {"name": "Poison Jab", "power": 80, "accuracy": 100, "category": "P"},
+    85: {"name": "Dream Eater", "power": 100, "accuracy": 100, "category": "S"},
+    89: {"name": "U-Turn", "power": 70, "accuracy": 100, "category": "P"},
+    91: {"name": "Flash Cannon", "power": 80, "accuracy": 100, "category": "S"},
+    93: {"name": "Wild Charge", "power": 90, "accuracy": 100, "category": "P"},
+    94: {"name": "Surf", "power": 90, "accuracy": 100, "category": "S"},
+    95: {"name": "Snarl", "power": 55, "accuracy": 95, "category": "S"},
+    97: {"name": "Dark Pulse", "power": 80, "accuracy": 100, "category": "S"},
+    98: {"name": "Waterfall", "power": 80, "accuracy": 100, "category": "P"},
+    99: {"name": "Dazzling Gleam", "power": 80, "accuracy": 100, "category": "S"},
+}
+
+@bot.message_handler(commands=['tm00'])
+def handle_tm00(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        tm_list = "\n".join(f"|{tm_number}|{tm_info['name']}| {tm_info['power']}|{tm_info['accuracy']}|{tm_info['category']}|" for tm_number, tm_info in tm_data.items())
+        bot.reply_to(message, f"TM List:\n\n{tm_list}")
+
+@bot.message_handler(func=lambda message: re.match(r'tm\d{2}', message.text.lower()))
+def handle_tm(message):
+    match = re.match(r'tm(\d{2})', message.text.lower())
+    tm_number = int(match.group(1))
+    
+    if tm_number not in tm_data:
+        bot.reply_to(message, "TM not found. Please check the TM number and try again.")
+        return
+    
+    tm_info = tm_data[tm_number]
+    category = "Physical" if tm_info["category"] == "P" else "Special"
+    response_message = (
+        f"TM{tm_number} 💿:\n\n"
+        f"{tm_info['name']} [{category}]\n"
+        f"Power: {tm_info['power']}, Accuracy: {tm_info['accuracy']}\n\n"
+        f"You can sell this TM for PDs 💵 in hexa"
+    )
+    
+    bot.reply_to(message, response_message)
+    
+verified_emoji = "✅"
+
+@bot.message_handler(commands=['profile'])
+def send_profile(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        user_id = message.from_user.id
+        user_name = message.from_user.first_name
+        is_approved = user_id in admin_ids
+    
+        profile_message = f"{user_name}, This Is your Profile\n"
+        if is_approved:
+            profile_message += f"{verified_emoji} Approved\n"
+        else:
+            profile_message += "Not Approved\n"
+    
+        bot.reply_to(message, profile_message)
+
+@bot.message_handler(commands=['host'])
+def send_host(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.chat.type == 'private':
+            host_message = "Want To Create Auction Bot Like This?"
+            markup = InlineKeyboardMarkup()
+            btn = InlineKeyboardButton(text='Contact', url='https://t.me/ZDATOR')
+            markup.add(btn)
+        
+            bot.reply_to(message, host_message, reply_markup=markup)
+        else:
+            bot.reply_to(message, "This command can only be used in private messages.")
+
+@bot.message_handler(commands=['sellerinfo'])
+def send_sellerinfo(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.chat.type == 'private':
+            sellerinfo_message = """
+🔺Formats For Use Seller Command:-
+
+🔹To Find 0l Seller :-
+/seller <pokename>
+E.g. /seller slakoth, /seller Abra
+
+🔹To Find 6l Seller:-
+/seller 6l <pokename>
+E.g. /seller 6l yveltal, /seller 6l mewtwo
+
+🔹To Find Shiny Seller:-
+/seller shiny <pokename>
+E.g. /seller shiny ponyta, /seller shiny steelix
+
+🔹To Find TMs Seller :-
+/seller <tm>
+E.g. /seller TM12, /seller TM73
+
+🔹To Find Team Seller :-
+/seller <teamname> Team
+E.g. /seller HP Team, /seller Spa Team
+"""
+            bot.reply_to(message, sellerinfo_message)
+        else:
+            bot.reply_to(message, "This command can only be used in private messages.")
+
+sold_items = []
+
+@bot.message_handler(commands=['buyers'])
+def handle_buyers(message):
+    if str(message.from_user.id) in banned_users:
+        bot.reply_to(message, "You Are Banned By an Administrator")
+    else:
+        if message.from_user.id not in admin_ids:
+            bot.reply_to(message, "You are not authorized to use this command.")
+            return
+
+        if not sold_items:
+            bot.reply_to(message, "No items have been sold yet.")
+            return
+
+        buyers_list = "📋 List of Buyers:\n\n"
+        for pokemon_name, buyer_username, amount in sold_items:
+            buyers_list += f"🔹 {pokemon_name} sold to @{buyer_username} for {amount}\n"
+
+        bot.reply_to(message, buyers_list)
+
+bot.skip_pending = True
+
+user_ids = set()
+
+bot.polling(non_stop=True)
