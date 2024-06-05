@@ -97,15 +97,19 @@ def is_admin(user_id):
 
 admin_id = [1661129466, 6468596992, 6241067084, 1655924853] 
 
+
+# Placeholder lists, replace these with actual data
 dxgays = []  # List of user IDs that are in dxgays
-xmods = []   # List of user IDs that are xmods
+xmods = [1661129466, 6468596992, 6241067084, 1655924853]   # List of user IDs that are xmods
 user_cache = {}
 
+# Constants, replace with actual values
+AUCTION_GROUP_LINK = 'your_auction_group_link_here'
 AUCTION_GROUP_LINK = 'https://t.me/phg_hexa_group'
-log_channel = -1001872076127  # Replace with your log channel ID
+log_channel = -1002078082096  # Replace with your log channel ID
 post_channel = -1001872076127  # Replace with your post channel ID
 approve_channel = -1002078082096  # Replace with your approve channel ID
-reject_channel = -1002078082096  # Replace with your reject channel ID
+reject_channel = -1002207877714  # Replace with your reject channel ID
 
 @bot.message_handler(commands=['add'])
 def sell(message):
@@ -159,59 +163,67 @@ def callback_handler(call):
 
 def handle_legendary(call):
     bot.edit_message_text('OK! Legendary', call.message.chat.id, call.message.message_id)
-    bot.send_message(call.from_user.id, 'Forward Nature Pic of pokemon')
-    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_nature_pic, 'legendary')
+    bot.send_message(call.from_user.id, 'Enter Pokemon name')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_pokemon_name, 'legendary')
 
 def handle_non_legendary(call):
     bot.edit_message_text('OK! NON Legendary', call.message.chat.id, call.message.message_id)
-    bot.send_message(call.from_user.id, 'Forward Nature Pic of pokemon')
-    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_nature_pic, 'non_legendary')
+    bot.send_message(call.from_user.id, 'Enter Pokemon name')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_pokemon_name, 'non_legendary')
 
 def handle_shiny(call):
     bot.edit_message_text('OK! Shiny', call.message.chat.id, call.message.message_id)
-    bot.send_message(call.from_user.id, 'Forward Nature Pic of pokemon')
-    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_nature_pic, 'shiny')
+    bot.send_message(call.from_user.id, 'Enter Pokemon name')
+    bot.register_next_step_handler_by_chat_id(call.from_user.id, process_pokemon_name, 'shiny')
 
 def handle_tms(call):
     bot.edit_message_text('OK! TMS', call.message.chat.id, call.message.message_id)
     bot.send_message(call.from_user.id, 'Forward TM')
     bot.register_next_step_handler_by_chat_id(call.from_user.id, process_tm, 'tm')
 
-def process_nature_pic(message, item_type):
+def process_pokemon_name(message, item_type):
+    pokemon_name = message.text
+    bot.send_message(message.chat.id, 'Forward Nature Pic of pokemon')
+    bot.register_next_step_handler(message, process_nature_pic, item_type, pokemon_name)
+
+def process_nature_pic(message, item_type, pokemon_name):
     if message.photo:
+        user_cache[message.chat.id] = {'pokemon_name': pokemon_name, 'nature_pic': message.photo[-1].file_id}
         bot.send_message(message.chat.id, 'Forward Evs Pic of pokemon')
-        bot.register_next_step_handler(message, process_evs_pic, item_type, message.caption)
+        bot.register_next_step_handler(message, process_evs_pic, item_type, pokemon_name, message.caption)
     else:
         bot.send_message(message.chat.id, "An error occurred, please restart the process. Please forward the pic with nature too. If the pic isn't present, an error will happen again")
 
-def process_evs_pic(message, item_type, nature):
+def process_evs_pic(message, item_type, pokemon_name, nature):
     if message.photo:
+        user_cache[message.chat.id]['evs_pic'] = message.photo[-1].file_id
         bot.send_message(message.chat.id, 'Forward moveset pic of pokemon')
-        bot.register_next_step_handler(message, process_moveset_pic, item_type, nature, message.caption)
+        bot.register_next_step_handler(message, process_moveset_pic, item_type, pokemon_name, nature, message.caption)
     else:
         bot.send_message(message.chat.id, "An error occurred, please restart the process. Please forward the pic with evs and ivs too. If the pic isn't present, an error will happen again")
 
-def process_moveset_pic(message, item_type, nature, evs):
+def process_moveset_pic(message, item_type, pokemon_name, nature, evs):
     if message.photo:
+        user_cache[message.chat.id]['moveset_pic'] = message.photo[-1].file_id
         bot.send_message(message.chat.id, 'IS ANY STAT BOOSTED? (Answer in only 1 message)')
-        bot.register_next_step_handler(message, process_boosted_stat, item_type, nature, evs, message.caption)
+        bot.register_next_step_handler(message, process_boosted_stat, item_type, pokemon_name, nature, evs, message.caption)
     else:
         bot.send_message(message.chat.id, "An error occurred, please restart the process. Please forward the pic with moveset too. If the pic isn't present, an error will happen again")
 
-def process_boosted_stat(message, item_type, nature, evs, moveset):
+def process_boosted_stat(message, item_type, pokemon_name, nature, evs, moveset):
     boosted = message.text
     bot.send_message(message.chat.id, 'Set base')
-    bot.register_next_step_handler(message, process_base, item_type, nature, evs, moveset, boosted)
+    bot.register_next_step_handler(message, process_base, item_type, pokemon_name, nature, evs, moveset, boosted)
 
-def process_base(message, item_type, nature, evs, moveset, boosted):
+def process_base(message, item_type, pokemon_name, nature, evs, moveset, boosted):
     base = message.text
     user_id = message.chat.id
-    text = f"#{item_type.capitalize()}\nUser id - {user_id}\nUsername : @{message.from_user.username}\n\nAbout Pokemon:- \n{nature}\nEvs and Ivs:-\n{evs}\nMoveset:- \n{moveset}\nBoosted - \n{boosted}\n\nBase - {base}"
-    user_cache[user_id] = {'text': text}
+    text = f"#{item_type.capitalize()}\nUser id - {user_id}\nUsername : @{message.from_user.username}\nPokemon Name: {pokemon_name}\n\nAbout Pokemon:- \n{nature}\nEvs and Ivs:-\n{evs}\nMoveset:- \n{moveset}\nBoosted - \n{boosted}\n\nBase - {base}"
+    user_cache[user_id]['text'] = text
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submit'))
     markup.add(types.InlineKeyboardButton('Delete', callback_data='delete'))
-    bot.send_photo(user_id, nature_pic, caption=text, reply_markup=markup)
+    bot.send_photo(user_id, user_cache[user_id]['nature_pic'], caption=text, reply_markup=markup)
 
 def process_tm(message, item_type):
     name = message.text
@@ -226,18 +238,20 @@ def process_tm_base(message, name):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submi'))
     markup.add(types.InlineKeyboardButton('Delete', callback_data='delet'))
-    bot.send_photo(user_id, nature_pic, caption=text, reply_markup=markup)
+    bot.send_message(user_id, text, reply_markup=markup)
 
 def submit_item(call):
     user_id = call.from_user.id
     text = user_cache[user_id]['text']
+    photo = user_cache[user_id]['nature_pic']
     bot.send_message(call.message.chat.id, text + "\n\nSUBMITTED\nUsually it takes 3-4 hours to get accepted or rejected, Check the buttons below", reply_markup=types.InlineKeyboardMarkup().add(types.InlineKeyboardButton('AUCTION GROUP', url=AUCTION_GROUP_LINK)))
-    bot.send_message(log_channel, text, reply_markup=types.InlineKeyboardMarkup().add(types.InlineKeyboardButton('APPROVE', callback_data='approve'),
-                                                                                      types.InlineKeyboardButton('REJECT', callback_data='reject'),
-                                                                                      types.InlineKeyboardButton('REJECT TRASH', callback_data='rejtrash'),
-                                                                                      types.InlineKeyboardButton('REJECT INCOMPLETE', callback_data='rejinco'),
-                                                                                      types.InlineKeyboardButton('REJECT HIGHBASE', callback_data='highbase'),
-                                                                                      types.InlineKeyboardButton('REPORT AS SCAMMER', callback_data='scammer')))
+    bot.send_photo(log_channel, photo, caption=text, reply_markup=types.InlineKeyboardMarkup().add(
+        types.InlineKeyboardButton('APPROVE', callback_data='approve'),
+        types.InlineKeyboardButton('REJECT', callback_data='reject'),
+        types.InlineKeyboardButton('REJECT TRASH', callback_data='rejtrash'),
+        types.InlineKeyboardButton('REJECT INCOMPLETE', callback_data='rejinco'),
+        types.InlineKeyboardButton('REJECT HIGHBASE', callback_data='highbase'),
+        types.InlineKeyboardButton('REPORT AS SCAMMER', callback_data='scammer')))
 
 def submit_tm(call):
     user_id = call.from_user.id
@@ -271,7 +285,6 @@ def handle_admin_actions(call):
         bot.delete_message(log_channel, call.message.message_id)
     else:
         bot.answer_callback_query(call.id, 'You are not the auctioneer', show_alert=True)
-
 
 
 @bot.message_handler(commands=['msg'])
