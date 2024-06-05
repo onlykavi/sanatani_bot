@@ -97,8 +97,8 @@ def is_admin(user_id):
 
 admin_id = [1661129466, 6468596992, 6241067084, 1655924853] 
 
-dxgays = [1661129466, 1655924853, 6241067084]  # List of user IDs that are in dxgays
-xmods = [1661129466, 6468596992, 6241067084, 1655924853]   # List of user IDs that are xmods
+dxgays = []  # List of user IDs that are in dxgays
+xmods = []   # List of user IDs that are xmods
 user_cache = {}
 
 AUCTION_GROUP_LINK = 'https://t.me/phg_hexa_group'
@@ -483,7 +483,12 @@ def handle_cmds(message):
                      Owner commands :-
 —————————————————————————                     
 • /clear :- For bot owner (OWNER)''')
-
+admin_ids = {
+    1661129466: 'ᴰᴮᴬ ᴢᴇɴɪᴛꜱᴜ',
+    6468596992: 'ARYAN NISHAD ᴵᴴᴳ',
+    6241067084: 'ʀ𝙴ᴢ𝚆∆ɴ',
+    1655924853: 'ᴵᴴᴳ╰‿╯. ꜱʜᴇɪᴋʜ ꜱʜΔʜɪᴅ'
+}
 
 @bot.message_handler(commands=['admin'])
 def handle_admins(message):
