@@ -63,8 +63,8 @@ def handle_joined(call):
     user_id = call.from_user.id
 
     try:
-        auction_status = bot.get_chat_member(chat_id="@IHGtradegroup", user_id=user_id).status
-        trade_status = bot.get_chat_member(chat_id="@IHG_Hexa_Auction", user_id=user_id).status 
+        auction_status = bot.get_chat_member(chat_id="@phg_hexa", user_id=user_id).status
+        trade_status = bot.get_chat_member(chat_id="@PHG_Hexa_group", user_id=user_id).status 
         has_joined_auction = auction_status in ['member', 'administrator', 'creator']
         has_joined_trade = trade_status in ['member', 'administrator', 'creator']
     except:
