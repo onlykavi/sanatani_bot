@@ -33,7 +33,7 @@ NOTE :- No need to fork you can directly deploy easily</h2>
 <li>Delete button to delete response if anything goes wrong</li>
 <li>Seller can easily check pending approved and rejected channel by clicking on the links provided by the bot</li>
 <li>Seller can easily see that day's auction items in auction channel link</li></ul>
-
+ 
 <li>EASY FOR ADMIN TO HANDLE</li><ul>
 </li>Owner can customize start button of bot in heroku</li>
 <li>Admin can easily approve or reject items with a single click</li>
