@@ -496,12 +496,67 @@ def handle_cmds(message):
                      Owner commands :-
 —————————————————————————                     
 • /clear :- For bot owner (OWNER)''')
-admin_ids = {
-    1661129466: 'ᴰᴮᴬ ᴢᴇɴɪᴛꜱᴜ',
-    6468596992: 'ARYAN NISHAD ᴵᴴᴳ',
-    6241067084: 'ʀ𝙴ᴢ𝚆∆ɴ',
-    1655924853: 'ᴵᴴᴳ╰‿╯. ꜱʜᴇɪᴋʜ ꜱʜΔʜɪᴅ'
-}
+        
+
+# Bot toke
+# Admin list (store IDs as strings, including the new admin IDs)
+admin_ids = ['1661129466', '6265981509', '5816482345']  # Updated admin list
+
+# Helper function to get the username or ID
+def get_username_or_id(user_id):
+    try:
+        user = bot.get_chat(user_id)
+        if user.username:
+            return f'@{user.username}'
+        else:
+            return f'{user.id}'
+    except telebot.apihelper.ApiTelegramException:
+        return f'{user_id} (unable to fetch details)'
+
+# Admin command to promote a user to admin using username or ID
+@bot.message_handler(commands=['admin'])
+def add_admin(message):
+    # Check if the user sending the command is an admin
+    if str(message.from_user.id) not in admin_ids:
+        bot.send_message(message.chat.id, "Only current admins can use this command.")
+        return
+
+    try:
+        args = message.text.split()
+        if len(args) != 2:
+            bot.send_message(message.chat.id, "Usage: /admin <@username or user_id>")
+            return
+        
+        identifier = args[1]
+
+        # If a username is provided
+        if identifier.startswith('@'):
+            username = identifier[1:]
+            try:
+                # Try to get the user ID by username
+                user = bot.get_chat_member(message.chat.id, username)
+                user_id = user.user.id
+            except Exception as e:
+                bot.send_message(message.chat.id, f"User @{username} not found.")
+                return
+        
+        # If an ID is provided
+        else:
+            try:
+                user_id = int(identifier)
+            except ValueError:
+                bot.send_message(message.chat.id, "Invalid user ID.")
+                return
+
+        # Add the user to the admin list if they're not already an admin
+        if str(user_id) not in admin_ids:
+            admin_ids.append(str(user_id))
+            bot.send_message(message.chat.id, f"User {get_username_or_id(user_id)} has been added to the admin list.")
+        else:
+            bot.send_message(message.chat.id, f"User {get_username_or_id(user_id)} is already an admin.")
+    
+    except Exception as e:
+        bot.send_message(message.chat.id, "An error occurred while processing the request.")
 
 @bot.message_handler(commands=['admin'])
 def handle_admins(message):
