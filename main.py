@@ -869,7 +869,7 @@ def send_host(message):
         if message.chat.type == 'private':
             host_message = "Want To Create Auction Bot Like This?"
             markup = InlineKeyboardMarkup()
-            btn = InlineKeyboardButton(text='Contact', url='https://t.me/Anime2005yes)
+            btn = InlineKeyboardButton(text='Contact', url=f'https://t.me/Anime2005yes')
             markup.add(btn)
         
             bot.reply_to(message, host_message, reply_markup=markup)
