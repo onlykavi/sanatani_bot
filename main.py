@@ -551,6 +551,7 @@ def add_admin(message):
         # Add the user to the admin list if they're not already an admin
         if str(user_id) not in admin_ids:
             admin_ids.append(str(user_id))
+            xmods.append(str(user_id))
             bot.send_message(message.chat.id, f"User {get_username_or_id(user_id)} has been added to the admin list.")
         else:
             bot.send_message(message.chat.id, f"User {get_username_or_id(user_id)} is already an admin.")
@@ -558,7 +559,7 @@ def add_admin(message):
     except Exception as e:
         bot.send_message(message.chat.id, "An error occurred while processing the request.")
 
-@bot.message_handler(commands=['admin'])
+@bot.message_handler(commands=['admins'])
 def handle_admins(message):
     if str(message.from_user.id) in banned_users:
         bot.reply_to(message, "You Are Banned By an Administrator")
