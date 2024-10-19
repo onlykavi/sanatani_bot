@@ -10,7 +10,7 @@ import re
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telebot.types import InputMediaPhoto
 
-API_TOKEN = '6796970894:AAFbyciSZJOf_DB4NIQrBe-euLcNehg0NZo'
+API_TOKEN = '7742936770:AAEWwX8LBMNg0U4N6JlwLtfdZWfsLpzBfaA'
 
 bot = telebot.TeleBot(API_TOKEN)
 
@@ -92,7 +92,7 @@ def handle_cancel(message):
 
 
 def is_admin(user_id):
-    admin_ids = [1661129466, 6468596992, 6241067084, 1655924853] 
+    admin_ids = [1661129466, 6468596992, 6241067084, 6265981509 , 1655924853] 
     return user_id in admin_ids
 
 admin_id = [1661129466, 6468596992, 6241067084, 1655924853] 
@@ -105,11 +105,11 @@ user_cache = {}
 
 # Constants, replace with actual values
 AUCTION_GROUP_LINK = 'your_auction_group_link_here'
-AUCTION_GROUP_LINK = 'https://t.me/phg_hexa_group'
-log_channel = -1002078082096  # Replace with your log channel ID
-post_channel = -1001872076127  # Replace with your post channel ID
-approve_channel = -1002078082096  # Replace with your approve channel ID
-reject_channel = -1002207877714  # Replace with your reject channel ID
+AUCTION_GROUP_LINK = 'https://t.me/+2li_q1Xmvv1jNzVl'
+log_channel = -1002223984722  # Replace with your log channel ID
+post_channel = -4567364815  # Replace with your post channel ID
+approve_channel = -1002223984722  # Replace with your approve channel ID
+reject_channel = -4539849027  # Replace with your reject channel ID
 
 @bot.message_handler(commands=['add'])
 def sell(message):
