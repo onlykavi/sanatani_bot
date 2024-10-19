@@ -22,8 +22,8 @@ broad_users = []
 
 def send_welcome_message(chat_id, username, first_name):
     markup = types.InlineKeyboardMarkup()
-    join_auction_btn = types.InlineKeyboardButton("Join Auction", url=f"https://t.me/phg_hexa")
-    join_trade_btn = types.InlineKeyboardButton("Join Trade", url=f"https://t.me/phg_hexa_group")
+    join_auction_btn = types.InlineKeyboardButton("Join Auction", url=f"https://t.me/+2li_q1Xmvv1jNzVl")
+    join_trade_btn = types.InlineKeyboardButton("Join trade ", url=f"https://t.me/+g6BD2B4azSRhZTY1")
     joined_btn = types.InlineKeyboardButton("Joined", callback_data="joined")
 
     markup.add(join_auction_btn, join_trade_btn)
