@@ -218,7 +218,7 @@ def process_boosted_stat(message, item_type, pokemon_name, nature, evs, moveset)
 def process_base(message, item_type, pokemon_name, nature, evs, moveset, boosted):
     base = message.text
     user_id = message.chat.id
-    text = f"#{item_type.capitalize()}\nUser id - {user_id}\nUsername : @{message.from_user.username}\nPokemon Name: {pokemon_name}\n\nAbout Pokemon:- \n{nature}\nEvs and Ivs:-\n{evs}\nMoveset:- \n{moveset}\nBoosted - \n{boosted}\n\nBase - {base}"
+    text = f"#{item_type.capitalize()}\n\nPokemon Name: {pokemon_name}\n\nAbout Pokemon:- \n{nature}\n\nEvs and Ivs:-\n{evs}\nMoveset:- \n\n{moveset}\nBoosted - \n{boosted}\n\nBase - {base} \n\nUser id - {user_id}\nUsername : @{message.from_user.username}"
     user_cache[user_id]['text'] = text
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('SUBMIT', callback_data='submit'))
@@ -868,7 +868,7 @@ def send_host(message):
         if message.chat.type == 'private':
             host_message = "Want To Create Auction Bot Like This?"
             markup = InlineKeyboardMarkup()
-            btn = InlineKeyboardButton(text='Contact', url='https://t.me/ZDATOR')
+            btn = InlineKeyboardButton(text='Contact', url='https://t.me/Anime2005yes)
             markup.add(btn)
         
             bot.reply_to(message, host_message, reply_markup=markup)
