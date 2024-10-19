@@ -95,7 +95,7 @@ def is_admin(user_id):
     admin_ids = [1661129466, 6468596992, 6241067084, 6265981509 , 1655924853] 
     return user_id in admin_ids
 
-admin_id = [1661129466, 6468596992, 6241067084, 1655924853] 
+admin_id = [1661129466, 6265981509, 6468596992, 6241067084, 1655924853] 
 
 
 # Placeholder lists, replace these with actual data
@@ -309,7 +309,7 @@ def handle_msg(message):
         except Exception as e:
             bot.reply_to(message, f"Failed to send message to user {user_id}: {e}")
 
-admin_ids_broad = [1661129466, 6468596992, 6241067084, 1655924853] 
+admin_ids_broad = [1661129466, 6468596992, 6241067084, 1655924853, 6265981509] 
 
 @bot.message_handler(commands=['broad'])
 def broadcast(message):
@@ -500,7 +500,7 @@ def handle_cmds(message):
 
 # Bot toke
 # Admin list (store IDs as strings, including the new admin IDs)
-admin_ids = ['1661129466', '6265981509', '5816482345']  # Updated admin list
+admin_ids = ['1661129466', '6265981509']  # Updated admin list
 
 # Helper function to get the username or ID
 def get_username_or_id(user_id):
@@ -552,6 +552,7 @@ def add_admin(message):
         if str(user_id) not in admin_ids:
             admin_ids.append(str(user_id))
             xmods.append(str(user_id))
+            admin_ids_broad.append(str(user_id))
             bot.send_message(message.chat.id, f"User {get_username_or_id(user_id)} has been added to the admin list.")
         else:
             bot.send_message(message.chat.id, f"User {get_username_or_id(user_id)} is already an admin.")
