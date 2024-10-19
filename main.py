@@ -266,7 +266,7 @@ def submit_tm(call):
 
 def handle_admin_actions(call):
     user_id = call.from_user.id
-    if user_id in xmods:
+    if user_id in admin_ids:
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         if call.data == 'approve':
             bot.forward_message(post_channel, log_channel, call.message.message_id)
